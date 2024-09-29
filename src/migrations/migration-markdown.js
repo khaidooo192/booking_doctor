@@ -22,19 +22,19 @@ module.exports = {
       },
       description: {
         allowNull: true,
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT('long')
       },
       doctorId: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.INTEGER
       },
-      specialtyId:{
-        allowNull: false,
-        type : Sequelize.INTEGER
+      specialtyId: {
+        allowNull: true,
+        type: Sequelize.INTEGER
       },
-      clinicId:{
-        allowNull: false,
-        type : Sequelize.INTEGER
+      clinicId: {
+        allowNull: true,
+        type: Sequelize.INTEGER
       },
 
       createdAt: {
