@@ -164,16 +164,10 @@ let bulkCreateSchedule = (data) => {
                     raw: true
                 }
             )
-            //convert date
-            if (existing && existing.length > 0) {
-                existing = existing.map(item => {
-                    item.date = new Date(item.date).getTime()
-                    return item
-                })
-            }
+          
             //compare different
             let toCreate = _.differenceWith(schedule, existing, (a, b) => {
-                return a.timeType === b.timeType && a.date === b.date;
+                return a.timeType === b.timeType && +a.date === +b.date;
             });
 
             //create data
@@ -181,9 +175,6 @@ let bulkCreateSchedule = (data) => {
                 await db.Schedule.bulkCreate(toCreate)
 
             }
-
-
-
 
             resolve({
                 errCode: 0,
@@ -195,11 +186,44 @@ let bulkCreateSchedule = (data) => {
         }
     })
 }
+let getScheduleByDate = (doctorId, date) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!doctorId || !date) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'missing parameter required'
+                })
+            } else {
+                let dataSchedule = await db.Schedule.findAll({
+                    where: {
+                        doctorId: doctorId,
+                        date: date
+                    },
+                    include:[
+                        {model: db.Allcode, as: 'timeTypeData', attributes:['valueEn', 'valueVi']}
+                    ],
+                    raw: true,
+                    nest: true
+                })
+
+                if (!dataSchedule) dataSchedule = []
+                resolve({
+                    errCode: 0,
+                    data: dataSchedule
+                })
+            }
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
 
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors: getAllDoctors,
     saveDetailInforDoctors: saveDetailInforDoctors,
     getDetailDoctorById: getDetailDoctorById,
-    bulkCreateSchedule: bulkCreateSchedule
+    bulkCreateSchedule: bulkCreateSchedule,
+    getScheduleByDate: getScheduleByDate
 }
